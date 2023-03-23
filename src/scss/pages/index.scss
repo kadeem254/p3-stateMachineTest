@@ -1,0 +1,7 @@
+@use "../clearfix";
+@use "../variables";
+
+body{
+  background-color: variables.$antiflash-white;
+  color: variables.$space-cadet;
+}
