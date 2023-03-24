@@ -11,8 +11,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
     this.body.setOffset( 8, 4 );
 
     this.body.setCollideWorldBounds( true );
-    this.setGravityY( 40 );
 
+    // variables to keep track of stats
+    this.setData({
+      // numerical values
+      walkSpeed: 64,
+      jumpHeight: 82,
+      // boolean values
+      canGroundJump: true,
+    }),
+
+    console.log( this.data.values );
     return this;
   }
 }

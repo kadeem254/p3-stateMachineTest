@@ -97,6 +97,8 @@ export default class PlayerController {
 
   // IDLE FUNCTIONS
   onEnter_Idle() {
+    console.log("enter idle state");
+    this.sprite.setData( "canGroundJump", true );
     this.sprite.anims.play("player_idle");
     return;
   }
@@ -122,12 +124,13 @@ export default class PlayerController {
   // WALK FUNCTIONS
   onEnter_Walk() {
     console.log("entered walk state");
+    this.sprite.setData( "canGroundJump", true );
     this.sprite.anims.play("player_walk");
     return;
   }
 
   onUpdate_Walk() {
-    let speed = 32;
+    let speed = this.sprite.getData("walkSpeed");
 
     let horizontal = this.checkHorizontalMovement();
 
@@ -156,12 +159,11 @@ export default class PlayerController {
   onEnter_Jump() {
     console.log("enter jump state");
     this.sprite.anims.play("player_jump");
-
     return;
   }
 
   onUpdate_Jump() {
-    let speed = 32;
+    let speed = this.sprite.getData("walkSpeed");
 
     let horizontal = this.checkHorizontalMovement();
 
@@ -184,8 +186,14 @@ export default class PlayerController {
 
       this.sprite.off(Phaser.Animations.Events.ANIMATION_UPDATE, jumpStart);
 
-      if (this.sprite.body.onFloor()) {
-        this.sprite.setVelocityY(-40);
+      if( 
+        this.sprite.body.onFloor() &&
+        this.sprite.getData("canGroundJump") == true
+      ){
+        this.sprite.setData("canGroundJump", false)
+        console.log( "actual jump starts here" );
+        this.addJumpDustEffect();
+        this.sprite.setVelocityY( this.sprite.getData("jumpHeight") * -1 || -40 );
       }
 
       return;
@@ -207,12 +215,13 @@ export default class PlayerController {
   // FALL FUNCTIONS
   onEnter_Fall() {
     console.log("enter fall state");
+
     this.sprite.anims.play("player_fall");
     return;
   }
 
   onUpdate_Fall() {
-    let speed = 32;
+    let speed = this.sprite.getData("walkSpeed") * 0.75;
     let horizontal = this.checkHorizontalMovement();
 
     switch (horizontal) {
@@ -272,5 +281,14 @@ export default class PlayerController {
     }
 
     return 0;
+  }
+
+  addJumpDustEffect(){
+    let dustEffect = this.scene.dustEffectsGroup.getFirstDead( true );
+    dustEffect.setPosition( this.sprite.x, this.sprite.y );
+    dustEffect.setActive( true );
+    dustEffect.setVisible( true );
+    dustEffect.anims.play({key: "dustEffect_jump"});
+    return;
   }
 }
